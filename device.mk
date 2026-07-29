@@ -4,11 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# Soong namespaces
+# Soong namespaces.
+# This repo declares a soong_namespace of its own in Android.bp, so without
+# listing itself here none of its modules resolve -- MobileFeliCa* and the
+# prebuilt NFC apps were being dropped silently by ALLOW_MISSING_DEPENDENCIES.
 PRODUCT_SOONG_NAMESPACES += \
-    vendor/nxp/opensource/sn100x \
-    vendor/nxp/opensource/commonsys/packages/apps/Nfc \
-    vendor/nxp/opensource/commonsys/external/libnfc-nci
+    vendor/motorola/felica-common
 
 # Avoid compile errors
 RELAX_USES_LIBRARY_CHECK := true
@@ -21,25 +22,27 @@ PRODUCT_PACKAGES += \
     MobileFeliCaWebPluginBoot
 
 # NFC
-TARGET_USES_NQ_NFC := true
-
+# NQNfcNci and its libs are the stock (Android 12) NXP NFC app. Nothing here
+# replaces AOSP's NfcNci any more: the prebuilt app cannot run on the Android 15
+# framework, and RemovePackagesNfcNci used to strip AOSP's app while NQNfcNci was
+# unresolvable, leaving the ROM with no NFC application at all.
+# FeliCa off-host routing is configured in the NXP HAL conf instead
+# (DEFAULT_NFCF_ROUTE / DEFAULT_SYS_CODE_ROUTE, see device/motorola/cypfr).
 PRODUCT_PACKAGES += \
-    Tag \
-    NQNfcNci \
-    libsn100nfc-nci \
-    libsn100nfc_nci_jni \
-    nfc_nci.nqx.default.hw
-
-# Force remove unwanted NfcNci
-PRODUCT_PACKAGES += RemovePackagesNfcNci
+    Tag
 
 # FeliCa configs
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/blobs/system_ext/etc/sysconfig/com.felicanetworks.powersave.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/sysconfig/com.felicanetworks.powersave.xml \
     $(LOCAL_PATH)/blobs/product/etc/felica/common.cfg:$(TARGET_COPY_OUT_PRODUCT)/etc/felica/common.cfg \
     $(LOCAL_PATH)/blobs/product/etc/felica/mfm.cfg:$(TARGET_COPY_OUT_PRODUCT)/etc/felica/mfm.cfg \
-    $(LOCAL_PATH)/blobs/product/etc/felica/mfs.cfg:$(TARGET_COPY_OUT_PRODUCT)/etc/felica/mfs.cfg \
-    $(LOCAL_PATH)/blobs/system/etc/libnfc-nci.conf:$(TARGET_COPY_OUT_SYSTEM)/etc/libnfc-nci.conf
+    $(LOCAL_PATH)/blobs/product/etc/felica/mfs.cfg:$(TARGET_COPY_OUT_PRODUCT)/etc/felica/mfs.cfg
+
+# blobs/system/etc/libnfc-nci.conf is deliberately not installed. Its values are
+# for a different board (NFA_MAX_EE_SUPPORTED=0x02 vs 0x03, POLLING_TECH_MASK
+# =0x2F vs 0x0F, no DEFAULT_SYS_CODE) and it also collides with the copy AOSP's
+# NfcNci installs. cypfr gets /vendor/etc/libnfc-nci_SN100.conf instead, which is
+# what persist.nfc_cfg.config_file_name points at.
 
 # Permissions
 $(foreach f, $(wildcard $(LOCAL_PATH)/blobs/system/etc/permissions/*.xml), \
