@@ -8,6 +8,7 @@ android_app_import {
     name: "NQNfcNci",
     apk: "*/NQNfcNci.apk",
     presigned: true,
+    preprocessed: true,
     system_ext_specific: true,
 }
 
@@ -15,6 +16,7 @@ android_app_import {
     name: "NfcNciNxp",
     apk: "*/NfcNciNxp.apk",
     presigned: true,
+    preprocessed: true,
     system_ext_specific: true,
 }
 
@@ -22,6 +24,7 @@ android_app_import {
     name: "NfcSec",
     apk: "*/NfcSec.apk",
     presigned: true,
+    preprocessed: true,
     system_ext_specific: true,
 }
 
@@ -29,5 +32,6 @@ android_app_import {
     name: "Nfc_st",
     apk: "*/Nfc_st.apk",
     presigned: true,
+    preprocessed: true,
     system_ext_specific: true,
 }

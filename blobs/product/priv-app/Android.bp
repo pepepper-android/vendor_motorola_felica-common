@@ -8,6 +8,7 @@ android_app_import {
     name: "MobileFeliCaClient",
     apk: "*/MobileFeliCaClient.apk",
     presigned: true,
+    preprocessed: true,
     product_specific: true,
     privileged: true,
     
@@ -20,6 +21,7 @@ android_app_import {
     name: "MobileFeliCaMenuMainApp",
     apk: "*/MobileFeliCaMenuMainApp.apk",
     presigned: true,
+    preprocessed: true,
     product_specific: true,
     privileged: true,
     
@@ -32,6 +34,7 @@ android_app_import {
     name: "MobileFeliCaSettingApp",
     apk: "*/MobileFeliCaSettingApp.apk",
     presigned: true,
+    preprocessed: true,
     product_specific: true,
     privileged: true,
     
@@ -44,6 +47,7 @@ android_app_import {
     name: "MobileFeliCaWebPluginBoot",
     apk: "*/MobileFeliCaWebPluginBoot.apk",
     presigned: true,
+    preprocessed: true,
     product_specific: true,
     privileged: true,
 }
