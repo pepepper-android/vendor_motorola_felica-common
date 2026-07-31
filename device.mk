@@ -59,7 +59,21 @@ $(foreach f, $(wildcard $(LOCAL_PATH)/blobs/system_ext/framework/*.jar), \
     $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_SYSTEM_EXT)/framework/$(notdir $f)))
 
 # Libraries
-$(foreach f, $(wildcard $(LOCAL_PATH)/blobs/system_ext/lib/*.so), \
-    $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_SYSTEM_EXT)/lib/$(notdir $f)))
-$(foreach f, $(wildcard $(LOCAL_PATH)/blobs/system_ext/lib64/*.so), \
-    $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_SYSTEM_EXT)/lib64/$(notdir $f)))
+#
+# blobs/system_ext/lib{,64} is deliberately NOT installed. Every .so in there is
+# part of the stock (Android 12) NFC stack -- the JNI libraries for NQNfcNci,
+# NfcSec, Nfc_st and NfcNciNxp, their libnfc-nci forks, and the HIDL client libs
+# they use -- and none of those apps is installed any more.
+#
+# Copying them actively breaks NFC on Android 15. AOSP now ships the NFC app in
+# the com.android.nfcservices APEX with libnfc-nci linked statically into its
+# libnfc_nci_jni.so, but /system_ext/lib64 is searched first, so the app picked
+# up the stock libnfc_nci_jni.so instead -- which still wants a separate
+# libnfc-nci.so that no longer exists anywhere:
+#
+#   java.lang.UnsatisfiedLinkError: dlopen failed: library "libnfc-nci.so"
+#     not found: needed by /system_ext/lib64/libnfc_nci_jni.so
+#     in namespace clns-shared-7
+#
+# If a FeliCa app ever turns out to need one of these, add it back by name --
+# not with a wildcard.
